@@ -13,6 +13,7 @@ switch($tipo){
         $idempleado    = $_GET['idempleado'];
         $idcliente     = $_GET['idcliente'];
         $precio        = $_GET['precio'];
+        $seña          = $_GET['seña'];
         $idtp          = $_GET['idtp'];
         $idtipo        = $_GET['idtipo'];
         $observaciones = $_GET['observaciones'];
@@ -25,12 +26,13 @@ switch($tipo){
         $idempleado    = $_GET['idempleado'];
         $idcliente     = $_GET['idcliente'];
         $precio        = $_GET['precio'];
+        $seña          = $_GET['seña'];
         $idtp          = $_GET['idtp'];
         $idtipo        = $_GET['idtipo'];
         $idestado      = $_GET['idestado'];
         $observaciones = $_GET['observaciones'];
         
-        echo modificacionTrabajo($idtrabajo,$fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$precio,$idtp,$observaciones,$idc);
+        echo modificacionTrabajo($idtrabajo,$fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$precio,$seña,$idtp,$observaciones,$idc);
         
         break;  
     case '3': //BAJA
@@ -39,7 +41,7 @@ switch($tipo){
         echo eliminarTrabajo($idtrabajo,$idc);
         break;  
 }
-function altaTrabajo($fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$precio,$idtp,$observaciones,$idc){
+function altaTrabajo($fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$precio,$seña,$idtp,$observaciones,$idc){
     $res = new stdClass();
     
     if(trim($idempleado) === ''){
@@ -82,6 +84,18 @@ function altaTrabajo($fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$pre
         $fechaEntrega = 'NULL';
     }else{$fechaEntrega = "'".invertirFechaHora($fechaEntrega,"/","-").":00'";}
     
+    if(trim($seña) === ''){
+        $seña = 'NULL';
+    }else{
+        if(floatval($precio) < floatval($seña)){
+            $res->cod = -1;
+            $res->leyenda = "LA SEÑA NO PUEDE SUPERAR AL PRECIO TOTAL";
+            return json_encode($res);
+        }else{
+            $seña = "'$seña'";
+        }
+    }
+    
     if(trim($observaciones) === ''){
         $observaciones = 'NULL';
     }else{$observaciones = "'".$observaciones."'";}
@@ -90,7 +104,7 @@ function altaTrabajo($fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$pre
     $dbh = objDB();
     
     try{
-        $sql = "insert into trabajos(fechaCreacion,fechaEntrega,idestado,tipo,idempleado,idcliente,precio,idtp,observaciones,idc) values (now(),$fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,'$precio',$idtp,$observaciones,$idc)";
+        $sql = "insert into trabajos(fechaCreacion,fechaEntrega,idestado,tipo,idempleado,idcliente,precio,seña,idtp,observaciones,idc) values (now(),$fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,'$precio',$seña,$idtp,$observaciones,$idc)";
 
         $stmt = $dbh->prepare($sql);
         $stmt->execute();  
@@ -146,7 +160,7 @@ function eliminarTrabajo($idtrabajo,$idc){
     return json_encode($res);
 }
 
-function modificacionTrabajo($idtrabajo,$fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$precio,$idtp,$observaciones,$idc){
+function modificacionTrabajo($idtrabajo,$fechaEntrega,$idestado,$idtipo,$idempleado,$idcliente,$precio,$seña,$idtp,$observaciones,$idc){
     
     $res = new stdClass();
     if(trim($idtrabajo) === ''){
@@ -194,14 +208,25 @@ function modificacionTrabajo($idtrabajo,$fechaEntrega,$idestado,$idtipo,$idemple
         $fechaEntrega = 'NULL';
     }else{$fechaEntrega = "'".invertirFechaHora($fechaEntrega,"/","-").":00'";}
     
+    if(trim($seña) === ''){
+        $seña = 'NULL';
+    }else{
+        if(floatval($precio) < floatval($seña)){
+            $res->cod = -1;
+            $res->leyenda = "LA SEÑA NO PUEDE SUPERAR AL PRECIO TOTAL";
+            return json_encode($res);
+        }else{
+            $seña = "'$seña'";
+        }
+    }
+    
     if(trim($observaciones) === ''){
         $observaciones = 'NULL';
     }else{$observaciones = "'".$observaciones."'";}
-    
+        
     $dbh = objDB();
     try{
-        $sql = "update trabajos set tipo = $idtipo, idestado = $idestado, fechaEntrega = $fechaEntrega, idempleado = $idempleado, idcliente = $idcliente, observaciones = $observaciones, precio = '$precio', idtp = $idtp where idtrabajo = $idtrabajo and idc = $idc";
-    //die(trim($sql));
+        $sql = "update trabajos set tipo = $idtipo, idestado = $idestado, seña = $seña, fechaEntrega = $fechaEntrega, idempleado = $idempleado, idcliente = $idcliente, observaciones = $observaciones, precio = '$precio', idtp = $idtp where idtrabajo = $idtrabajo and idc = $idc";
 
         $stmt = $dbh->prepare($sql);
         $stmt->execute();  

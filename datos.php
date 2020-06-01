@@ -159,6 +159,7 @@ function trabajos(){
         $a->idcliente     = $row['idcliente'];
         $a->idestado      = $row['idestado'];
         $a->precio        = $row['precio'];
+        $a->seña          = $row['seña'];
         $a->tipo          = $row['tipo'];
         $a->observaciones = $row['observaciones'];
         $a->idtp          = $row['idtp'];

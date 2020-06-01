@@ -163,6 +163,7 @@ $(document).ready(function() {
             var idempleado    = $("#idempleadoN").val();
             var idcliente     = $("#idclienteN").val();
             var precio        = $("#precioN").val();
+            var seña          = $("#señaN").val();
             var idtp          = $("#idtpN").val();
             var idtipo        = $("#idtipoN").val();
             var observaciones = $("#observacionesN").val();
@@ -170,7 +171,7 @@ $(document).ready(function() {
             $.ajax({
                 method: 'GET',
                 url: 'ABMTrabajos.php',
-                data: {fechaEntrega: fechaEntrega, idtipo: idtipo, idempleado: idempleado, idcliente: idcliente, precio: precio, idtp: idtp, observaciones: observaciones, tipo: 1},
+                data: {fechaEntrega: fechaEntrega, idtipo: idtipo, idempleado: idempleado, idcliente: idcliente, precio: precio, seña: seña, idtp: idtp, observaciones: observaciones, tipo: 1},
                 success: function (data) {
                     var html = jQuery.parseJSON(data);
                     if(html.cod == 0){
@@ -192,6 +193,7 @@ $(document).ready(function() {
         var idempleado    = $("#idempleado"+id).val();
         var idcliente     = $("#idcliente"+id).val();
         var precio        = $("#precio"+id).val();
+        var seña          = $("#seña"+id).val();
         var idtp          = $("#idtp"+id).val();
         var idtipo        = $("#idtipo"+id).val();
         var idestado      = $("#idestado"+id).val();
@@ -200,7 +202,7 @@ $(document).ready(function() {
         $.ajax({
             method: 'GET',
             url: 'ABMTrabajos.php',
-            data: {idtrabajo: id, fechaEntrega: fechaEntrega, idtipo: idtipo, idestado: idestado, idempleado: idempleado, idcliente: idcliente, precio: precio, idtp: idtp, observaciones: observaciones, tipo: 2},
+            data: {idtrabajo: id, fechaEntrega: fechaEntrega, idtipo: idtipo, idestado: idestado, idempleado: idempleado, idcliente: idcliente, precio: precio, seña: seña, idtp: idtp, observaciones: observaciones, tipo: 2},
             success: function (data) {
                 var html = jQuery.parseJSON(data);
                 if(html.cod == 0){
@@ -235,5 +237,34 @@ $(document).ready(function() {
             });
         }
     });
+    
+    $(".observ").on('click', function(e) {
+        e.preventDefault();
+        $.colorbox({
+            href:'traza/traza_formulario/0/1',
+            width: "95%",
+            height: "95%",
+            onClosed: function(){
+                if($("#b").html()==='1'){
+                    $('#frmBuscadorABMTrazas').submit();
+                    $("#b").html('');
+                }
+            },                
+            onComplete: function() {
+                                
+                
+                $("#guardarTrazaComo").css('visibility','hidden');
+                $('#permite_descuento').on('change',function(){
+                    if($(this).val()==='1'){
+                        $('#descuento').removeAttr('readonly');
+                    }else{
+                        $('#descuento').attr('readonly','readonly');
+                    }
+                });   
+                $('#permite_descuento').change();
+            }            
+        });
+    });
+    
     /*TRABAJOS*/
 });
