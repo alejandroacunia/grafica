@@ -18,7 +18,7 @@ switch($tipo){
         $idtipo        = $_GET['idtipo'];
         $observaciones = $_GET['observaciones'];
         
-        echo altaTrabajo($fechaEntrega,1,$idtipo,$idempleado,$idcliente,$precio,$idtp,$observaciones,$idc);
+        echo altaTrabajo($fechaEntrega,1,$idtipo,$idempleado,$idcliente,$precio,$seña,$idtp,$observaciones,$idc);
         break;      
     case '2': //MODIFICACION
         $idtrabajo     = $_GET['idtrabajo'];

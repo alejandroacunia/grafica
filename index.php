@@ -8,7 +8,10 @@ include_once('datos.php');
 include_once('DB.php');
 
 $idcliente  = $_SESSION['idc']; if(trim($idcliente) === ''){die('IDC FALTANTE');}
-//$modulos    = misModulos($idcliente);
+$tp  = trabajosPendientes($idcliente);
+$psc = planesSinCuotas($idcliente);
+$pe  = proximosEventos($idcliente);
+$cuo = cuotasPorVencer($idcliente);
 
 //$tira    = obtTira();
 //$mensaje = $tira->mensaje;
@@ -86,65 +89,114 @@ $idcliente  = $_SESSION['idc']; if(trim($idcliente) === ''){die('IDC FALTANTE');
               </ul>
             </div>
           </nav>
-          <?php if(in_array('6',$modulos)){ ?>
             <div class="col-xs-12" style="text-align: -webkit-center;">
-              <fieldset class="container-fluid"><h2><u>Cabezas que más salen</u></h2>
-                  <fieldset class="container-fluid">
-                        <h3><em>
-                            <?php foreach($quinielas as $q){ echo " ".str_replace("_"," ",$q->nombre)." *"; } ?>
-                        </em></h3>
-                  <div class="row" style="width:50%;">
-                <table class="table table-striped table-bordered" style="font-size: 1.7em;float: left;width:31%;margin:8px;">
+                <?php if(count($tp) > 0){ ?>
+                <h2><u>Trabajos Pendientes</u></h2>
+                <div class="row" style="">
+                <table class="table table-striped table-bordered" style="font-size: 1.7em;width:65%;">
                     <thead>
                         <tr>
-                            <th style="width:45%;text-align: center;">2 cifras</th>
-                            <th style="width:55%;text-align: center;">Cantidad</th>
+                            <th style="width:15%;text-align: center;"><i>#</i></th>
+                            <th style="width:25%;text-align: center;">Fecha Entrega</th>
+                            <th style="width:30%;text-align: center;">Cliente</th>
+                            <th style="width:15%;text-align: center;">Importe</th>
+                            <th style="width:15%;text-align: center;">Asignado a...</th>
                         </tr>                        
                     </thead>
                     <tbody>
-                        <?php foreach($salidores2 as $c){ ?>
+                        <?php foreach($tp as $c){ $imp = explode(".",$c->precio);?>
                             <tr> 
-                                <td style="text-align: center;"><font color=red><b><?= $c->numero ?></b></font></td>
-                                <td style="text-align: center;"><?= $c->cant ?></td>
+                                <td style="text-align: center;"><i><font color=red><b><?= $c->idtrabajo ?></b></font></i></td>
+                                <td style="text-align: center;"><?= invertirFecha(left($c->fechaEntrega,10),"-","/") ?></td>
+                                <td style="text-align: center;"><?= $c->cliente ?></td>
+                                <td style="text-align: right;"><b><sub>$</sub></b><?= $imp[0] ?><sup><?= $imp[1] ?></sup></td>
+                                <td style="text-align: center;"><?= $c->empleado ?></td>
                             </tr>
                         <?php } ?>
                     </tbody>
-                </table>                  
-                <table class="table table-striped table-bordered" style="font-size: 1.7em;float: left;width:31%;margin:8px;">
+                </table>     
+                </div>
+                <?php } ?>
+                <?php if(count($psc) > 0){ ?>
+                <h2><u>Trabajos sin planes de cuotas definidos</u></h2>
+                <div class="row" style="">
+                <table class="table table-striped table-bordered" style="font-size: 1.7em;width:50%;">
                     <thead>
                         <tr>
-                            <th style="width:45%;text-align: center;">3 cifras</th>
-                            <th style="width:55%;text-align: center;">Cantidad</th>
+                            <th style="width:15%;text-align: center;"><i>#</i></th>
+                            <th style="width:25%;text-align: center;">Fecha Entrega</th>
+                            <th style="width:40%;text-align: center;">Cliente</th>
+                            <th style="width:20%;text-align: center;">Asignado a...</th>
                         </tr>                        
                     </thead>
                     <tbody>
-                        <?php foreach($salidores3 as $c){ ?>
+                        <?php foreach($psc as $c){ ?>
                             <tr> 
-                                <td style="text-align: center;"><font color=red><b><?= $c->numero ?></b></font></td>
-                                <td style="text-align: center;"><?= $c->cant ?></td>
+                                <td style="text-align: center;"><i><font color=red><b><?= $c->idtrabajo ?></b></font></i></td>
+                                <td style="text-align: center;"><?= invertirFecha(left($c->fechaEntrega,10),"-","/") ?></td>
+                                <td style="text-align: center;"><?= $c->cliente ?></td>
+                                <td style="text-align: center;"><?= $c->empleado ?></td>
                             </tr>
                         <?php } ?>
                     </tbody>
-                </table>
-                <table class="table table-striped table-bordered" style="font-size: 1.7em;float: left;width:31%;margin:8px;">
+                </table>     
+                </div>
+                <?php } ?>
+                <?php if(count($pe) > 0){ ?>
+                <h2><u>Próximos Eventos</u></h2>
+                <div class="row" style="">
+                <table class="table table-striped table-bordered" style="font-size: 1.7em;width:50%;">
                     <thead>
                         <tr>
-                            <th style="width:45%;text-align: center;">4 cifras</th>
-                            <th style="width:55%;text-align: center;">Cantidad</th>
+                            <th style="width:15%;text-align: center;"><i>#</i></th>
+                            <th style="width:25%;text-align: center;">Fecha Evento</th>
+                            <th style="width:40%;text-align: center;">Cliente</th>
+                            <th style="width:20%;text-align: center;">Asignado a...</th>
                         </tr>                        
                     </thead>
                     <tbody>
-                        <?php foreach($salidores4 as $c){ ?>
+                        <?php foreach($pe as $c){ ?>
                             <tr> 
-                                <td style="text-align: center;"><font color=red><b><?= $c->numero ?></b></font></td>
-                                <td style="text-align: center;"><?= $c->cant ?></td>
+                                <td style="text-align: center;"><i><font color=red><b><?= $c->idtrabajo ?></b></font></i></td>
+                                <td style="text-align: center;"><?= invertirFechaHora(left($c->fechaEntrega,16),"-","/") ?></td>
+                                <td style="text-align: center;"><?= $c->cliente ?></td>
+                                <td style="text-align: center;"><?= $c->empleado ?></td>
                             </tr>
                         <?php } ?>
                     </tbody>
-                </table>  
-              </div>
-            </fieldset>
+                </table>     
+                </div>
+                <?php } ?>
+                <?php if(count($cuo) > 0){ ?>
+                <h2><u>Próximos Cuotas por Vencer</u></h2>
+                <div class="row" style="">
+                <table class="table table-striped table-bordered" style="font-size: 1.7em;width:65%;">
+                    <thead>
+                        <tr>
+                            <th style="width:15%;text-align: center;"><i>#</i></th>
+                            <th style="width:15%;text-align: center;">Cuota</th>
+                            <th style="width:25%;text-align: center;">Vencimiento</th>
+                            <th style="width:30%;text-align: center;">Cliente</th>
+                            <th style="width:15%;text-align: center;">Importe</th>
+                            <th style="width:25%;text-align: center;"></th>
+                        </tr>                        
+                    </thead>
+                    <tbody>
+                        <?php foreach($cuo as $c){ $fecha = invertirFecha(left($c->fechaVenc,10),"-","/"); $imp = explode(".",$c->precio);?>
+                            <tr> 
+                                <td style="text-align: center;"><i><font color=red><b><?= $c->idtrabajo ?></b></font></i></td>
+                                <td style="text-align: center;"><b><?= $c->idcuota ?></b></td>
+                                <td style="text-align: center;color: <?= ($c->pago == 1) ? 'limegreen' : (($c->pago == 2) ? 'orange' : 'red') ?>;"><?= $fecha ?></td>
+                                <td style="text-align: center;"><?= $c->cliente ?></td>
+                                <td style="text-align: right;"><b><sub>$</sub></b><?= $imp[0] ?><sup><?= $imp[1] ?></sup></td>
+                                <td style="text-align: center;"><button id="recordatorio<?= $c->idcuota.$c->idtrabajo ?>" data-p="<?= $c->precio ?>" data-f="<?= $fecha ?>" data-idt="<?= $c->idtrabajo ?>" data-correo="<?= $c->correo ?>" data-id="<?= $c->idcuota ?>" class="recordatorio btn btn-warning btn-xs" title="Enviar Recordatorio a <?= $c->correo ?>">M</button>
+                            </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>     
+                </div> 
+                <?php } ?>
             </div>
-            <?php } ?>
     </body>
 </html>
