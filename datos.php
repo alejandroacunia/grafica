@@ -211,7 +211,9 @@ function proximosEventos(){
     
     $idc = $_SESSION['idc']; if(trim($idc) === ''){die("IDC Faltante.");}
     
-    $sql = "select t.*,c.nombre as cliente,e.apeynom as empleado from trabajos t inner join clientes c on c.idcliente = t.idcliente inner join empleados e on e.idempleado = t.idempleado where t.tipo = 2 and t.idc = $idc order by t.fechaEntrega asc";
+    $sql = "select t.*,c.nombre as cliente,e.apeynom as empleado from trabajos t 
+            inner join clientes c on c.idcliente = t.idcliente inner join empleados e on e.idempleado = t.idempleado
+            where t.tipo = 2 and t.idc = $idc and t.fechaEntrega <= NOW() order by t.fechaEntrega asc";
 
     $stmt = $dbh->prepare($sql);
     $stmt->execute();
@@ -337,4 +339,71 @@ function trabajosPendientes($idc){
     return $datos;    
 }
 /*INDEX*/
+/*RECORDATORIOS*/
+function recordatorios($idtr = '',$idtrabajo = '',$idcuota = '',$cliente = ''){
+    $idc = $_SESSION['idc']; if(trim($idc) === ''){die("IDC Faltante.");}
+    
+    if(trim($idtrabajo) === ''){$idtrabajo = 'NULL';}
+    if(trim($idcuota) === ''){$idcuota = 'NULL';}
+    if(trim($idtr) === ''){$idtr = 'NULL';}
+    if(trim($cliente) === ''){$cliente = 'NULL';}
+    
+    $sql = "select r.*,tr.descripcion as tipo,c.nombre as cliente from recordatorios r 
+            inner join tiposRecordatorio tr on tr.idtr = r.idtr 
+            inner join trabajos t on r.idtrabajo = r.idtrabajo
+            inner join clientes c on c.idcliente = t.idcliente and (c.nombre like '%$cliente%' or $cliente is null)
+            where (r.idtr = $idtr or $idtr is null) 
+            and (r.idtrabajo = $idtrabajo or $idtrabajo is null) 
+            and (r.idcuota = $idcuota or $idcuota is null) and r.idc = $idc";
+    $dbh = objDB();
+    
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+    $datos = [];
+        
+    foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row){     
+        $a                 = new stdClass();
+        $a->idrecordatorio = $row['idrecordatorio'];
+        $a->idtrabajo      = $row['idtrabajo'];
+        $a->idcuota        = $row['idcuota'];
+        $a->fechahora      = $row['fechahora'];
+        $a->tipo           = $row['tipo'];
+        $a->cliente        = $row['cliente'];
+        $datos[]           = $a;
+    }
+    
+    $stmt->closeCursor(); 
+    
+    $dbh  = null;
+    $stmt = null;
+    
+    return $datos;    
+}
+
+function tiposRecordatorio(){
+    $idc = $_SESSION['idc']; if(trim($idc) === ''){die("IDC Faltante.");}
+    
+    $sql = "select * from tiposRecordatorio";
+    $dbh = objDB();
+    
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+    $datos = [];
+        
+    foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row){     
+        $a                 = new stdClass();
+        $a->idtr         = $row['idtr'];
+        $a->descripcion  = $row['descripcion'];
+        $datos[]           = $a;
+    }
+    
+    $stmt->closeCursor(); 
+    
+    $dbh  = null;
+    $stmt = null;
+    
+    return $datos;    
+}
+/*RECORDATORIOS*/
+
 ?>

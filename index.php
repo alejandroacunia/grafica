@@ -168,7 +168,7 @@ $cuo = cuotasPorVencer($idcliente);
                 </div>
                 <?php } ?>
                 <?php if(count($cuo) > 0){ ?>
-                <h2><u>Próximos Cuotas por Vencer</u></h2>
+                <h2><u>Próximos Vencimientos de Cuotas Impagas</u></h2>
                 <div class="row" style="">
                 <table class="table table-striped table-bordered" style="font-size: 1.7em;width:65%;">
                     <thead>

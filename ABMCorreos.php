@@ -23,7 +23,7 @@ switch($tipo){
         }else{
             $res->leyenda = "OCURRIO UN ERROR AL ENVIAR EL RECORDATORIO a $mail";
         }
-        echo json_encode($res);;
+        echo json_encode($res);
         break;
 }
 
